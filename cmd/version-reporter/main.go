@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"os/exec"
 	"runtime"
@@ -38,21 +39,26 @@ func main() {
 func runMain() error {
 	log.SetFlags(0) // Removes default timestamp flag
 
-	packageMpedData, err := getInstalledPackages()
+	packagesVersion, err := getInstalledPackages()
 	if err != nil {
 		return err
+	}
+	if nodeOut, err := ioutil.ReadFile("/etc/cacophony/salt-nodegroup"); err != nil {
+		log.Println("failed to read salt nodegroup")
+	} else {
+		packagesVersion["salt-nodegroup"] = strings.TrimSpace(string(nodeOut))
 	}
 
 	event := eventclient.Event{
 		Timestamp: time.Now(),
 		Type:      "versionData",
-		Details:   packageMpedData,
+		Details:   packagesVersion,
 	}
 
 	for i := 3; i > 0; i-- {
 		err := eventclient.AddEvent(event)
 		if err == nil {
-			log.Println("added verionData event")
+			log.Println("added versionData event")
 			if err := eventclient.UploadEvents(); err != nil {
 				return err
 			}
