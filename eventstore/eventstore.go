@@ -28,6 +28,9 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
+	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/conn/v3/gpio/gpioreg"
+	"periph.io/x/host/v3"
 )
 
 const (
@@ -204,7 +207,30 @@ type EventDescription struct {
 }
 
 func (s *EventStore) Add(event *Event) error {
+	host.Init()
 	log.Printf("adding new %s event\n", event.Description.Type)
+	//TODO trigger things to happen on some type of events.
+
+	if event.Description.Type == "trapped" {
+		go func() {
+			log.Println("New trapped event. Triggering trap pin")
+
+			pin := gpioreg.ByName("GPIO4")
+			log.Println(pin)
+
+			log.Print("trigger trap pin high")
+			if err := pin.Out(gpio.High); err != nil {
+				log.Printf("failed to set camera power pin low: %v", err)
+			}
+			time.Sleep(3 * time.Second)
+
+			log.Print("trigge trpa pin low")
+			if err := pin.Out(gpio.Low); err != nil {
+				log.Printf("failed to set camera power pin high: %v", err)
+			}
+		}()
+	}
+
 	data, err := json.Marshal(event)
 	if err != nil {
 		return err

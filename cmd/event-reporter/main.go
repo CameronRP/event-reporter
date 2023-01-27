@@ -31,6 +31,9 @@ import (
 	"github.com/TheCacophonyProject/event-reporter/v3/eventstore"
 	"github.com/TheCacophonyProject/modemd/connrequester"
 	arg "github.com/alexflint/go-arg"
+	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/conn/v3/gpio/gpioreg"
+	"periph.io/x/host/v3"
 
 	"github.com/TheCacophonyProject/go-api"
 )
@@ -74,6 +77,10 @@ func runMain() error {
 	args := procArgs()
 	log.SetFlags(0) // Removes default timestamp flag
 	log.Printf("running version: %s", version)
+
+	host.Init()
+	pin := gpioreg.ByName("GPIO4")
+	pin.Out(gpio.Low)
 
 	store, err := eventstore.Open(args.DBPath)
 	if err != nil {

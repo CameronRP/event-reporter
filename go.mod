@@ -10,6 +10,8 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
 	github.com/godbus/dbus v0.0.0-20181101234600-2ff6f7ffd60f
 	github.com/stretchr/testify v1.7.0
+	periph.io/x/conn/v3 v3.6.10
+	periph.io/x/host/v3 v3.7.2
 )
 
 replace periph.io/x/periph => github.com/TheCacophonyProject/periph v2.1.1-0.20200615222341-6834cd5be8c1+incompatible
